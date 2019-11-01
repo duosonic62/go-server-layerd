@@ -1,15 +1,14 @@
 package main
 
 import (
-	"fmt"
+	"github.com/gin-gonic/gin"
 	"sample-sever/controler"
 )
 
 func main() {
-	user, error := controler.NewUser("sample", 10)
-	if error != nil {
-		fmt.Println("error!")
-		fmt.Println(error)
-	}
-	fmt.Println(*user)
+	router := gin.Default()
+
+	router.GET("/users", controler.GetUsers)
+
+	router.Run()
 }
