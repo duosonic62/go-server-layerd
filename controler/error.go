@@ -1,46 +1,22 @@
 package controler
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
+	"sample-sever/domain/errors"
 )
 
-type ApiError interface {
-	Error() string
-	GetCode() int
-	GetMessage() string
+// アプリに表示するエラー
+type PresentationError struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
-type ApplicationError struct {
-	Message string
-	Code    int
-}
-
-func New(code int, message string) ApplicationError {
-	return ApplicationError{
-		Code:    code,
-		Message: message,
-	}
-}
-
-func (appError ApplicationError) Error() string {
-	return appError.Message
-}
-
-func (appError ApplicationError) GetCode() int {
-	return appError.Code
-}
-
-func (appError ApplicationError) GetMessage() string {
-	errors.New()
-	return appError.Message
-}
-
+// API共通のエラーハンドリング
 func commonError(context *gin.Context, err error) {
 	switch e := err.(type) {
-	case *ApplicationError:
-		context.JSON(e.Code, err)
+	case errors.ApplicationError:
+		context.JSON(e.GetCode(), PresentationError{Code: e.GetCode(), Message: e.GetFrontMessage()})
 	default:
-		context.JSON(500, New(500, e.Error()))
+		context.JSON(500, PresentationError{Code: 500, Message: "INTERNAL SERVER ERROR"})
 	}
 }
